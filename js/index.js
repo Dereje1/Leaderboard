@@ -3,16 +3,29 @@ class LeadBoard extends React.Component{
   constructor(props){
     super(props);
     this.state={
-      "full":retrievData()
+      "full":[]
     }
     this.changeRecent = this.changeRecent.bind(this);
     this.changeAllTime = this.changeAllTime.bind(this);
   }
+  componentDidMount(){
+    var url = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";
+    $.getJSON(url,function(data){
+      console.log(data)
+      this.setState({full:data});
+    }.bind(this))
+  }
   changeRecent(){
-    this.setState({full:retrievData()});
+    var url = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";
+    $.getJSON(url,function(data){
+      this.setState({full:data});
+    }.bind(this))
   }
   changeAllTime(){
-    this.setState({full:retrievData("Alltime")});
+    var url = "https://fcctop100.herokuapp.com/api/fccusers/top/alltime";
+    $.getJSON(url,function(data){
+      this.setState({full:data});
+    }.bind(this))
   }
   rowBuilder(){
     var leaderData=this.state.full;
@@ -21,11 +34,11 @@ class LeadBoard extends React.Component{
     var buildRow=[];
     for(var i=0;i<stateLength;i++){
       buildRow.push(
-        <tr>
+        <tr className="tRow">
           <th scope="row">{i+1}</th>
-          <td>{leaderData[i].username}</td>
-          <td>{leaderData[i].recent}</td>
-          <td>{leaderData[i].alltime}</td>
+          <td className="user"><img className="userPic" src={leaderData[i].img}/>{leaderData[i].username}</td>
+          <td className="recentPoints">{leaderData[i].recent}</td>
+          <td className="allTimePoints">{leaderData[i].alltime}</td>
          </tr>
       )
     }
@@ -54,25 +67,3 @@ ReactDOM.render(
   <LeadBoard/>,
   document.getElementById('app')
 );
-
-function retrievData(targTime = "recent"){
-    if (targTime==="recent"){
-      var targetUrl = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";
-    }
-    else{
-      var targetUrl = "https://fcctop100.herokuapp.com/api/fccusers/top/alltime";
-    }
-
-    var mydata = [];
-    $.ajax({
-      url: targetUrl,
-      async: false,
-      dataType: 'json',
-      success: function (leaderData) {
-
-        mydata = leaderData;
-      }
-    });
-
-    return mydata;
-  }
