@@ -6,30 +6,19 @@ class LeadBoard extends React.Component{
     this.state={
       "full":[]
     }
-    //bindings for internal function
-    this.changeRecent = this.changeRecent.bind(this);
-    this.changeAllTime = this.changeAllTime.bind(this);
   }
+
   componentDidMount(){
-    var url = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";
+    this.getData("recent",this)
+  }
+
+  getData(dataset,bindTo){
     //note "this" not recognized for getJSON unless explicitly bound to success function called after data retrieval
+    if(dataset==="recent"){var url = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";}
+    else{var url = "https://fcctop100.herokuapp.com/api/fccusers/top/alltime"}
     $.getJSON(url,function(data){
-      this.setState({full:data});
-    }.bind(this))//<-- must include!!
-  }
-  //called on recent period click
-  changeRecent(){
-    var url = "https://fcctop100.herokuapp.com/api/fccusers/top/recent";
-    $.getJSON(url,function(data){
-      this.setState({full:data});
-    }.bind(this))
-  }
-  //called on alltime click
-  changeAllTime(){
-    var url = "https://fcctop100.herokuapp.com/api/fccusers/top/alltime";
-    $.getJSON(url,function(data){
-      this.setState({full:data});
-    }.bind(this))
+      bindTo.setState({full:data});
+    }.bind(bindTo))//<-- must include!!
   }
   //for building all the rows of table
   rowBuilder(){
@@ -52,6 +41,7 @@ class LeadBoard extends React.Component{
   }
   //renders bootstrap table
   render(){
+    //note, have to use arrow function for onclick to pass parameters to getData otherwise, must use separate functions
     return(
       <div>
         <div className="title text-center">freeCodeCamp Leaderboard</div>
@@ -60,8 +50,8 @@ class LeadBoard extends React.Component{
             <tr>
               <th>#</th>
               <th className="user">Camper Name</th>
-              <th><a href="#" onClick={this.changeRecent}>Points in past 30 days</a></th>
-              <th><a href="#" onClick={this.changeAllTime}>All time points</a></th>
+              <th><a href="#" onClick={()=>this.getData("recent",this)}>Points in past 30 days</a></th>
+              <th><a href="#" onClick={()=>this.getData("alltime",this)}>All time points</a></th>
             </tr>
           </thead>
           <tbody>{this.rowBuilder()}</tbody>
